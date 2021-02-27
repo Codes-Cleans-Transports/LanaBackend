@@ -20,7 +20,7 @@ def generate_sofia_data():
     sofia_data = []
     for i in range(sofia_points):
         sofia_data.append(DeviceData(id=1,
-                                     cluster_id=1,
+                                     clusterId=1,
                                      buckets=sofia_bucket_data[i],
                                      location=sofia_local_data[i]
                                      ))
@@ -34,9 +34,9 @@ def generate_varna_data():
         for j in range(40):
             varna_bucket_data[i].append(random() * 100)
     varna_data = []
-    for i in range(sofia_points):
+    for i in range(varna_points):
         varna_data.append(DeviceData(id=1,
-                                     cluster_id=1,
+                                     clusterId=1,
                                      buckets=varna_bucket_data[i],
                                      location=varna_local_data[i]
                                      ))
@@ -50,9 +50,9 @@ def generate_burgas_data():
         for j in range(40):
             burgas_bucket_data[i].append(random() * 100)
     burgas_data = []
-    for i in range(sofia_points):
+    for i in range(burgas_points):
         burgas_data.append(DeviceData(id=1,
-                                      cluster_id=1,
+                                      clusterId=1,
                                       buckets=burgas_bucket_data[i],
                                       location=burgas_local_data[i]
                                       ))
