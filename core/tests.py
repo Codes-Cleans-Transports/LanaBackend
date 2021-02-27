@@ -16,10 +16,12 @@ class CoreTestCase(TestCase):
     def assertEq(self, obj1, obj2):
         self.assertEquals(obj1.id, obj2.id)
         self.assertEquals(obj1.clusterId, obj2.clusterId)
-        self.assertEquals(obj1.buckets[0]['data'], obj2.buckets[0]['data'])
-        self.assertEquals(obj1.buckets[0]['currentSequence'], obj2.buckets[0]['currentSequence'])
-        self.assertEquals(obj1.buckets[0]['overflow'], obj2.buckets[0]['overflow'])
-        self.assertEquals(obj1.buckets[0]['maxSize'], obj2.buckets[0]['maxSize'])
+        for i in range(0, len(obj1.buckets)):
+            self.assertEquals(obj1.buckets[i]['data'], obj2.buckets[i]['data'])
+            self.assertEquals(obj1.buckets[i]['currentSequence'], obj2.buckets[i]['currentSequence'])
+            self.assertEquals(obj1.buckets[i]['overflow'], obj2.buckets[i]['overflow'])
+            self.assertEquals(obj1.buckets[i]['maxSize'], obj2.buckets[i]['maxSize'])
+
         self.assertEquals(obj1, obj2)
 
     def test_MongodbSave(self):
@@ -47,7 +49,10 @@ class CoreTestCase(TestCase):
         datetime_mock.now.return_value = current_time
 
         device = DeviceData(id = "1", clusterId = "cl1")
+
+
         addPing(device)
+
 
         expected = DeviceData(id = "1", clusterId = "cl1")
         expected.buckets[0]['currentSequence'] = 1
@@ -64,7 +69,9 @@ class CoreTestCase(TestCase):
         device.buckets[0]['currentSequence'] = 1
         device.buckets[0]['data'] = [{'uptime': 100, 'date': current_time}]
         
+
         addPing(device)
+
 
         expected = DeviceData(id = "1", clusterId = "cl1")
         expected.buckets[0]['currentSequence'] = 2
@@ -81,13 +88,15 @@ class CoreTestCase(TestCase):
         maxSize = device.buckets[0]['maxSize']
         data = [{'uptime': 100, 'date': current_time}] * maxSize
         device.buckets[0]['data'] = copy.deepcopy(data)
-        
+
+
         addPing(device)
 
-        expected = DeviceData(id = "1", clusterId = "cl1")
-        expected.buckets[0]['currentSequence'] = 1
+
         del data[0]
         data.append({'uptime': 100, 'date': current_time})
+        expected = DeviceData(id = "1", clusterId = "cl1")
+        expected.buckets[0]['currentSequence'] = 1
         expected.buckets[0]['data'] = data
 
         self.assertEq(expected, device)
@@ -104,11 +113,48 @@ class CoreTestCase(TestCase):
         data = [{'uptime': 100, 'date': current_time}] * (overflow - 1)
         device.buckets[0]['data'] = copy.deepcopy(data)
         
+
         addPing(device)
 
+
+        data.append({'uptime': 100, 'date': current_time})
+        expected = DeviceData(id = "1", clusterId = "cl1")
+
+        expected.buckets[0]['currentSequence'] = 0
+        expected.buckets[0]['data'] = data
+        expected.buckets[1]['currentSequence'] = 1
+        expected.buckets[1]['data'] = [{'uptime': 100, 'date': current_time}]
+
+        self.assertEq(expected, device)
+
+    @mock.patch("core.logic.datetime")
+    def test_addPingOverflowsMultipleBuckets(self, datetime_mock):
+        current_time = datetime.datetime.now()
+        datetime_mock.now.return_value = current_time
+
+        device = DeviceData(id = "1", clusterId = "cl1")
+
+        overflowFirstBucket = device.buckets[0]['overflow']
+        data = [{'uptime': 100, 'date': current_time}] * (overflowFirstBucket - 1)
+        device.buckets[0]['currentSequence'] = overflowFirstBucket - 1
+        device.buckets[0]['data'] = copy.deepcopy(data)
+
+        overflowSecondBucket = device.buckets[1]['overflow']
+        data = [{'uptime': 100, 'date': current_time}] * (overflowSecondBucket - 1)
+        device.buckets[1]['currentSequence'] = overflowSecondBucket - 1
+        device.buckets[1]['data'] = copy.deepcopy(data)
+        
+
+        addPing(device)
+
+
+        data.append({'uptime': 100, 'date': current_time})
         expected = DeviceData(id = "1", clusterId = "cl1")
         expected.buckets[0]['currentSequence'] = 0
-        data.append({'uptime': 100, 'date': current_time})
         expected.buckets[0]['data'] = data
+        expected.buckets[1]['currentSequence'] = 0
+        expected.buckets[1]['data'] = data
+        expected.buckets[2]['currentSequence'] = 1
+        expected.buckets[2]['data'] = [{'uptime': 100, 'date': current_time}]
 
         self.assertEq(expected, device)
