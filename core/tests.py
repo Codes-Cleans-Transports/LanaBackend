@@ -169,7 +169,6 @@ class CoreTestCase(TestCase):
 
         self.assertEq(expected, device)
 
-
 class TestGetDevicesByClusterAndBucketLevel(TestCase):
 
     def setUp(self):
@@ -203,4 +202,3 @@ class TestGetDevicesByClusterAndBucketLevel(TestCase):
         for device in devices_info:
             self.assertEquals(device.cluster_id, self.cluster_id)
         
-

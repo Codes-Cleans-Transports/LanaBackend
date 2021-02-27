@@ -18,6 +18,8 @@ class DeviceInfo:
         self.uptime = uptime
 
 
+timeBetweenPings = 60
+
 def acceptPing(devicePing: DevicePing):
     try:
         device = DeviceData.objects.get(id = devicePing.id, clusterId = devicePing.clusterId)
@@ -32,18 +34,21 @@ def acceptPing(devicePing: DevicePing):
     return device
 
 def addPing(device: DeviceData):
-    addNewSegmentToList(device, 100, 0)
+    missingDates = getMissingDates(device)
+    for date in missingDates:
+        addNewSegmentToList(device, date, 0, 0)
+    addNewSegmentToList(device, datetime.now(), 100, 0)
 
     checkForOverflow(device, 0)
 
-def addNewSegmentToList(device, uptime, bucket):
+def addNewSegmentToList(device, time, uptime, bucket):
     maxSize = device.buckets[bucket]['maxSize']
     q = deque(device.buckets[bucket]['data'])
 
     if(len(q) == maxSize):
         q.pop()
 
-    data = {'uptime': 100, 'date': datetime.now()}
+    data = {'uptime': uptime, 'date': time}
     q.append(data)
     device.buckets[bucket]['currentSequence'] += 1
     device.buckets[bucket]['data'] = list(q)
@@ -58,7 +63,7 @@ def overflow(device, bucket):
         device.buckets[bucket]['currentSequence'] = 0
 
         uptime = getNextSegmentAvg(device, bucket)
-        addNewSegmentToList(device, uptime, bucket + 1)
+        addNewSegmentToList(device, datetime.now(), uptime, bucket + 1)
 
         checkForOverflow(device, bucket + 1)
 
@@ -101,5 +106,21 @@ def getDevicesByClusterAndBucketLevel(
         )
 
     return devices
-    
-    
+
+def getMissingDates(device: DeviceData):
+    if len(device.buckets[0]['data']) == 0:
+        return []
+
+    now = datetime.now()
+    lastUpdated = device.buckets[0]['data'][0]
+    elapsedTime = (now - lastUpdated['date']).total_seconds()
+    missedIntervals = int(elapsedTime / timeBetweenPings)
+
+    return generateMissingSegments(lastUpdated['date'], missedIntervals - 1)
+        
+def generateMissingSegments(startDate, number):
+    data = []
+    for i in range(0, number):
+        data.append(startDate + datetime.timedelta(seconds=i * timeBetweenPings))
+
+    return data
