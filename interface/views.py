@@ -18,7 +18,7 @@ class CreatePingView(views.APIView):
         input_serializer = self.InputSerializer(data=request.data)
         input_serializer.is_valid()
 
-        acceptPing(DevicePing(id=device_id, clusterId=cluster_id, location=input_serializer['location'], date=datetime.now()))
+        acceptPing(DevicePing(id=device_id, clusterId=cluster_id, location=input_serializer['location']))
 
         return Response()
 
