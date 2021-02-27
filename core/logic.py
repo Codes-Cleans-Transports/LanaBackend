@@ -5,11 +5,10 @@ from collections import deque
 from typing import List
 
 class DevicePing:
-    def __init__(self, id: str, clusterId: str, location: str, date: datetime):
+    def __init__(self, id: str, clusterId: str, location: str):
         self.id = id
         self.clusterId = clusterId
         self.location = location
-        self.date = date
 
 class DeviceInfo:
     def __init__(self, id: str, cluster_id: str, location: str, uptime: float):
@@ -18,14 +17,19 @@ class DeviceInfo:
         self.location = location
         self.uptime = uptime
 
+
 def acceptPing(devicePing: DevicePing):
     try:
         device = DeviceData.objects.get(id = devicePing.id, clusterId = devicePing.clusterId)
+        
+        device.location = devicePing.location
     except DeviceData.DoesNotExist as _:
         device = createDevice(devicePing)
 
     addPing(device)
     device.save()
+
+    return device
 
 def addPing(device: DeviceData):
     addNewSegmentToList(device, 100, 0)
@@ -69,7 +73,14 @@ def Average(lst):
     return sum(lst) / len(lst) 
 
 def createDevice(devicePing: DevicePing):
-    return DeviceData(devicePing.id, devicePing.clusterId)
+    device = DeviceData(devicePing.id, devicePing.clusterId)
+    device.buckets = [ \
+        {"currentSequence": 0, "overflow": 10, "maxSize": 60, "data": []}, \
+        {"currentSequence": 0, "overflow": 10, "maxSize": 60, "data": []}, \
+        {"currentSequence": 0, "overflow": 10, "maxSize": 60, "data": []}, \
+    ]
+
+    return device
 
 def getDevicesByClusterAndBucketLevel(
     *,
@@ -85,7 +96,7 @@ def getDevicesByClusterAndBucketLevel(
                 id=device.id,
                 cluster_id=cluster_id,
                 location=device.location,
-                uptime=device.buckets[bucket_level].data[0].uptime
+                uptime=device.buckets[bucket_level]['data'][0]['uptime']
             )
         )
 
