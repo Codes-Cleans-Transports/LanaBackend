@@ -23,14 +23,13 @@ class TimeArray(models.Model):
 
 class DeviceData(models.Model):
 
-    def __init__(self, id: str, clusterId: str):
-        super(self)
-        self.id = id
-        self.clusterId = clusterId
-        self.days = TimeArray()
-        self.days.data = []
-        self.months = TimeArray()
-        self.months.data = []
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.days = {"currentSequence": 1, "overFlow": 2, "data": []}
+        # self.days = TimeArray()
+        # self.days.data = []
+        # self.months = TimeArray()
+        # .months.data = []
 
     id = models.CharField(max_length=255, primary_key=True)
     clusterId = models.CharField(max_length=255)
