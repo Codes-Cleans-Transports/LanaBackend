@@ -2,11 +2,13 @@ from django.test import TestCase
 from core.models import *
 from core.logic import *
 import datetime
+from datetime import timedelta
+
+import copy
+
+from unittest import mock
 
 class CoreTestCase(TestCase):
-
-    def now(self):
-        return datetime.datetime.now()
 
     # This code is interly for error message visibility. 
     # We couldn't figure out which method to override to get a detailed deserialization of the objects on error
@@ -30,7 +32,7 @@ class CoreTestCase(TestCase):
         self.assertTrue(device == savedDevice)
 
     # def test_savePing(self):
-    #     ping = DevicePing('1', 'cl1', 'here', self.now())
+    #     ping = DevicePing('1', 'cl1', 'here', current_time)
     #     savePing(ping)
 
     #     expected = DeviceData('1', 'cl1')
@@ -38,40 +40,75 @@ class CoreTestCase(TestCase):
     #     received = DeviceData.objects.get(id = '1')
     #     self.assertEq(expected, device)
 
-    def test_addPingEmpty(self):
+    @mock.patch("core.logic.datetime") 
+    def test_addPingEmpty(self, datetime_mock):
+        current_time = datetime.datetime.now()
+        datetime_mock.now.return_value = current_time
+
         device = DeviceData(id = "1", clusterId = "cl1")
         addPing(device)
 
         expected = DeviceData(id = "1", clusterId = "cl1")
         expected.days['currentSequence'] = 1
-        expected.days['data'] = [{'uptime': 100, 'date': self.now()}]
+        expected.days['data'] = [{'uptime': 100, 'date': current_time}]
 
         self.assertEq(expected, device)
 
-    def test_addPingExisting(self):
+    @mock.patch("core.logic.datetime")
+    def test_addPingExisting(self, datetime_mock):
+        current_time = datetime.datetime.now()
+        datetime_mock.now.return_value = current_time
+
         device = DeviceData(id = "1", clusterId = "cl1")
         device.days['currentSequence'] = 1
-        device.days['data'] = [{'uptime': 100, 'date': self.now()}]
+        device.days['data'] = [{'uptime': 100, 'date': current_time}]
         
         addPing(device)
 
         expected = DeviceData(id = "1", clusterId = "cl1")
         expected.days['currentSequence'] = 2
-        expected.days['data'] = [{'uptime': 100, 'date': self.now()}, {'uptime': 100, 'date': self.now()}]
+        expected.days['data'] = [{'uptime': 100, 'date': current_time}, {'uptime': 100, 'date': current_time}]
 
         self.assertEq(expected, device)
 
+    @mock.patch("core.logic.datetime")
+    def test_addPingRemovesIfFull(self, datetime_mock):
+        current_time = datetime.datetime.now()
+        datetime_mock.now.return_value = current_time
 
-    def test_addPingRemovesIfFull(self):
         device = DeviceData(id = "1", clusterId = "cl1")
-        device.days['currentSequence'] = 10
-        data = [{'uptime': 100, 'date': self.now()}] * 10
-        device.days['data'] = data
+        overflow = device.days['overFlow']
+        # device.days['currentSequence'] = overflow - 1
+        data = [{'uptime': 100, 'date': current_time}] * overflow
+        device.days['data'] = copy.deepcopy(data)
         
         addPing(device)
 
         expected = DeviceData(id = "1", clusterId = "cl1")
         expected.days['currentSequence'] = 1
-        expected.days['data'] = data.append({'uptime': 100, 'date': self.now()})
+        del data[0]
+        data.append({'uptime': 100, 'date': current_time})
+        expected.days['data'] = data
+
+        self.assertEq(expected, device)
+
+
+    @mock.patch("core.logic.datetime")
+    def test_addPingOverflows(self, datetime_mock):
+        current_time = datetime.datetime.now()
+        datetime_mock.now.return_value = current_time
+
+        device = DeviceData(id = "1", clusterId = "cl1")
+        overflow = device.days['overFlow']
+        device.days['currentSequence'] = overflow - 1
+        data = [{'uptime': 100, 'date': current_time}] * (overflow - 1)
+        device.days['data'] = copy.deepcopy(data)
+        
+        addPing(device)
+
+        expected = DeviceData(id = "1", clusterId = "cl1")
+        expected.days['currentSequence'] = 0
+        data.append({'uptime': 100, 'date': current_time})
+        expected.days['data'] = data
 
         self.assertEq(expected, device)

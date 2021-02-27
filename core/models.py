@@ -38,9 +38,6 @@ class DeviceData(models.Model):
             obj.days == self.days and \
             obj.months == self.months
 
-    def __format__(self, spec):
-        return self.__dict__
-
     id = models.CharField(max_length=255, primary_key=True)
     clusterId = models.CharField(max_length=255)
     days = models.EmbeddedField(
