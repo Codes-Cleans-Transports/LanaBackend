@@ -42,8 +42,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_neomodel',
     'rest_framework',
+<<<<<<< Updated upstream
     'core',
     'interface'
+=======
+    'interface',
+    'django_extensions'
+>>>>>>> Stashed changes
 ]
 
 MIDDLEWARE = [

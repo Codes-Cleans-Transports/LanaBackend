@@ -29,23 +29,23 @@ class TimeArray(models.Model):
     class Meta:
         abstract = True
 
-class TimeArrayForm(forms.ModelForm):
-    class Meta:
-        model = TimeArray
-        fields = (
-            'currentSequence', 'overFlow', 'data'
-        )
-
 class DeviceData(models.Model):
+
+    # def __init__(self, id: str, clusterId: str):
+    #     self.id = id
+    #     self.clusterId = clusterId
+    #     self.days = TimeArray()
+    #     self.days.data = []
+    #     self.months = TimeArray()
+    #     self.months.data = []
+
     id = models.CharField(max_length=255, primary_key=True)
     clusterId = models.CharField(max_length=255)
     days = models.EmbeddedField(
-        model_container=TimeArray,
-        model_form_class=TimeArrayForm
+        model_container=TimeArray
     )
     months = models.EmbeddedField(
-        model_container=TimeArray,
-        model_form_class=TimeArrayForm
+        model_container=TimeArray
     )
 
 class ClusterOwnershipRel(StructuredRel):
