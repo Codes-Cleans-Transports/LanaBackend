@@ -32,7 +32,8 @@ class DeviceData(models.Model):
         self.buckets = [ \
             {"currentSequence": 0, "overflow": 10, "maxSize": 60, "data": []}, \
             {"currentSequence": 0, "overflow": 10, "maxSize": 60, "data": []}, \
-            ]
+            {"currentSequence": 0, "overflow": 10, "maxSize": 60, "data": []}, \
+        ]
 
     def __eq__(self, obj):
         return \
@@ -44,8 +45,5 @@ class DeviceData(models.Model):
     id = models.CharField(max_length=255, primary_key=True)
     clusterId = models.CharField(max_length=255)
     buckets = models.ArrayField(
-        model_container=TimeArray
-    )
-    months = models.EmbeddedField(
         model_container=TimeArray
     )

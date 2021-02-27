@@ -1,12 +1,11 @@
 from django.test import TestCase
-from matplotlib import pyplot as plt
+# from matplotlib import pyplot as plt
 
 from grouping.Kmeans import get_clusters
 from grouping.models import Device
 
 
 # Create your tests here.
-
 
 def test_KMeans():
     devices = []

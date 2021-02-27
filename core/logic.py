@@ -19,25 +19,45 @@ def acceptPing(devicePing: DevicePing):
     device.save()
 
 def addPing(device: DeviceData):
-    addNewSegmentToList(device, 100)
+    addNewSegmentToList(device, 100, 0)
 
-    if(device.buckets[0]['currentSequence'] == device.buckets[0]['overflow']):
-        overflow(device)
+    checkForOverflow(device, 0)
 
-def addNewSegmentToList(device, uptime):
-    maxSize = device.buckets[0]['maxSize']
-    q = deque(device.buckets[0]['data'])
+def addNewSegmentToList(device, uptime, bucket):
+    maxSize = device.buckets[bucket]['maxSize']
+    q = deque(device.buckets[bucket]['data'])
 
     if(len(q) == maxSize):
         q.pop()
 
     data = {'uptime': 100, 'date': datetime.now()}
     q.append(data)
-    device.buckets[0]['currentSequence'] += 1
-    device.buckets[0]['data'] = list(q)
+    device.buckets[bucket]['currentSequence'] += 1
+    device.buckets[bucket]['data'] = list(q)
 
-def overflow(device):
-    device.buckets[0]['currentSequence'] = 0
+def checkForOverflow(device, bucket):
+    if(device.buckets[bucket]['currentSequence'] == device.buckets[bucket]['overflow']):
+        overflow(device, bucket)
+
+def overflow(device, bucket):
+    # Ignore if last bucket
+    if(bucket < len(device.buckets)):
+        device.buckets[bucket]['currentSequence'] = 0
+
+        uptime = getNextSegmentAvg(device, bucket)
+        addNewSegmentToList(device, uptime, bucket + 1)
+
+        checkForOverflow(device, bucket + 1)
+
+def getNextSegmentAvg(device, bucket):
+    overflow = device.buckets[bucket]['overflow']
+    data = device.buckets[bucket]['data'][:overflow]
+    uptime_list = list(map(lambda a : a['uptime'], data))
+    average = Average(uptime_list)
+    return average
+
+def Average(lst): 
+    return sum(lst) / len(lst) 
 
 def createDevice(devicePing: DevicePing):
     return DeviceData(devicePing.id, devicePing.clusterId)
