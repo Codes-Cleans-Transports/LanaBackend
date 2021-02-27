@@ -11,19 +11,11 @@ class TimeData(models.Model):
     class Meta:
         abstract = True
 
-class TimeDataForm(forms.ModelForm):
-    class Meta:
-        model = TimeData
-        fields = (
-            'uptime', 'date'
-        )
-
 class TimeArray(models.Model):
     currentSequence = models.IntegerField(default=0)
     overFlow = models.IntegerField(default=10)
     data = models.ArrayField(
-        model_container=TimeData,
-        model_form_class=TimeDataForm
+        model_container=TimeData
     )
 
     class Meta:
@@ -31,13 +23,14 @@ class TimeArray(models.Model):
 
 class DeviceData(models.Model):
 
-    # def __init__(self, id: str, clusterId: str):
-    #     self.id = id
-    #     self.clusterId = clusterId
-    #     self.days = TimeArray()
-    #     self.days.data = []
-    #     self.months = TimeArray()
-    #     self.months.data = []
+    def __init__(self, id: str, clusterId: str):
+        super(self)
+        self.id = id
+        self.clusterId = clusterId
+        self.days = TimeArray()
+        self.days.data = []
+        self.months = TimeArray()
+        self.months.data = []
 
     id = models.CharField(max_length=255, primary_key=True)
     clusterId = models.CharField(max_length=255)
