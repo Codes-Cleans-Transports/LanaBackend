@@ -20,5 +20,5 @@ from interface.views import CreatePingView, GetPingsView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('clusters/', GetPingsView.as_view())
+    path('clusters/<cluster_id>/ping/<device_id>/', CreatePingView.as_view())
 ]
