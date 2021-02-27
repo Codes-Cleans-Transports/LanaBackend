@@ -26,7 +26,7 @@ SECRET_KEY = '4ij1=e$c9=-!e&_z60)o!un$9q*znk2=94vjqk57%i0=2i%ig#'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 NEOMODEL_NEO4J_BOLT_URL = os.environ.get('NEO4J_BOLT_URL', 'bolt://neo4j:test@localhost:7687')
 
