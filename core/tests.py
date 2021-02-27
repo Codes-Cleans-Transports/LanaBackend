@@ -169,6 +169,33 @@ class CoreTestCase(TestCase):
 
         self.assertEq(expected, device)
 
+
+    @mock.patch("core.logic.datetime")
+    def test_addMissingIntervalsPing(self, datetime_mock):
+        location = '30.000 20.000'
+
+        current_time = datetime.datetime.now()
+        datetime_mock.now.return_value = current_time
+        old_time = current_time - timedelta(seconds=140)
+
+        device = createDevice(DevicePing(id="1", clusterId="cl1", location=location))
+
+        data = [{'uptime': 100, 'date': old_time}]
+        device.buckets[0]['currentSequence'] = 1
+        device.buckets[0]['data'] = copy.deepcopy(data)        
+
+        addPing(device)
+
+        data.append({'uptime': 0, 'date': old_time + timedelta(seconds=60)})
+        data.append({'uptime': 0, 'date': old_time + timedelta(seconds=120)})
+        data.append({'uptime': 100, 'date': current_time})
+        expected = createDevice(DevicePing(id="1", clusterId="cl1", location=location))
+        expected.buckets[0]['currentSequence'] = 4
+        expected.buckets[0]['data'] = data
+
+        self.assertEq(expected, device)
+
+
 class TestGetDevicesByClusterAndBucketLevel(TestCase):
 
     def setUp(self):
