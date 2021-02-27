@@ -1,6 +1,9 @@
 from djongo import models
 from django import forms
 
+from neomodel import *
+
+
 class TimeData(models.Model):
     uptime = models.DecimalField()
     date = models.DateTimeField()
@@ -44,3 +47,17 @@ class DeviceData(models.Model):
         model_container=TimeArray,
         model_form_class=TimeArrayForm
     )
+
+class ClusterOwnershipRel(StructuredRel):
+    pass
+
+class Device(StructuredNode):
+    last_hour_uptime = FloatProperty(default=100)
+
+    parent_cluster = Relationship('Cluster', 'PARENTS', model=ClusterOwnershipRel)
+
+
+class Cluster(StructuredNode):
+    average_uptime = FloatProperty(default=100)
+
+    parent_cluster = Relationship('Cluster', 'PARENTS', model=ClusterOwnershipRel)
