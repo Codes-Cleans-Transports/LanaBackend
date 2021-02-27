@@ -29,16 +29,16 @@ def addNewSegmentToList(device, uptime):
     overflow = device.days['overFlow']
     q = deque(device.days['data'])
 
-    if(q.count == overflow):
+    if(len(q) == overflow):
         q.pop()
 
-    data = {'uptime': 100, 'date': datetime.datetime.now()}
+    data = {'uptime': 100, 'date': datetime.now()}
     q.append(data)
     device.days['currentSequence'] += 1
     device.days['data'] = list(q)
 
 def overflow(device):
-    print("overflow")
+    device.days['currentSequence'] = 1
 
 def createDevice(devicePing: DevicePing):
     return DeviceData(devicePing.id, devicePing.clusterId)

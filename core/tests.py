@@ -4,6 +4,8 @@ from core.logic import *
 import datetime
 from datetime import timedelta
 
+import copy
+
 from unittest import mock
 
 class CoreTestCase(TestCase):
@@ -75,14 +77,17 @@ class CoreTestCase(TestCase):
         datetime_mock.now.return_value = current_time
 
         device = DeviceData(id = "1", clusterId = "cl1")
-        device.days['currentSequence'] = 10
-        data = [{'uptime': 100, 'date': current_time}] * 10
-        device.days['data'] = data
+        overflow = device.days['overFlow']
+        # device.days['currentSequence'] = overflow - 1
+        data = [{'uptime': 100, 'date': current_time}] * overflow
+        device.days['data'] = copy.deepcopy(data)
         
         addPing(device)
 
         expected = DeviceData(id = "1", clusterId = "cl1")
         expected.days['currentSequence'] = 1
-        expected.days['data'] = data.append({'uptime': 100, 'date': current_time})
+        del data[0]
+        data.append({'uptime': 100, 'date': current_time})
+        expected.days['data'] = data
 
         self.assertEq(expected, device)
