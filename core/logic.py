@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from core.models import DeviceData
 from collections import deque
 
@@ -30,7 +30,7 @@ def addPing(device: DeviceData):
         if(q.count == overflow):
             q.pop()
 
-        data = {'uptime': 100, 'date': datetime.datetime.now()}
+        data = {'uptime': 100, 'date': datetime.now()}
         q.append(data)
         device.days['data'] = list(q)
 
