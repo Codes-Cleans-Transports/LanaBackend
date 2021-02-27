@@ -1,16 +1,12 @@
 from django.test import TestCase
 from core.models import *
+import datetime
 
 class CoreTestCase(TestCase):
 
     def test_Example(self):
         """Mongodb saves"""
-        e = Entry()
-        e.blog = {
-            'name': 'Djongo'
-        }
-        e.headline = 'The Django MongoDB connector'
-        e.save()
-
-        post = Entry.objects.all()
-        print(post)
+        device = DeviceData(id = "1", clusterId = "cl1")
+        device.days = TimeArray()
+        device.days.data = [{'uptime': 0.1, 'date': str(datetime.datetime.now())}]
+        print(device.days.data)
