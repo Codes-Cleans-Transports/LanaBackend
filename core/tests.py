@@ -18,6 +18,18 @@ class CoreTestCase(TestCase):
         savedDevice = DeviceData.objects.get(id = '1')
         self.assertTrue(device == savedDevice)
 
+    def test_addPing(self):
+        device = DeviceData(id = "1", clusterId = "cl1")
+        addPing(device)
+
+        print(json.dumps(device))
+
+        expected = DeviceData(id = "1", clusterId = "cl1")
+        expected.days['currentSequence'] = 1
+        expected.days['data'] = [{'uptime': 100, 'date': self.now()}]
+
+        self.assertEquals(device, expected)
+
     def test_savePing(self):
         ping = DevicePing('1', 'cl1', 'here', self.now())
         savePing(ping)

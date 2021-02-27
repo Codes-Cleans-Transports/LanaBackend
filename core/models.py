@@ -1,5 +1,6 @@
 from djongo import models
 from django import forms
+import json
 
 from neomodel import *
 
@@ -26,6 +27,18 @@ class DeviceData(models.Model):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.days = {"currentSequence": 0, "overFlow": 10, "data": []}
+
+
+    def __eq__(self, obj):
+        return \
+            isinstance(obj, DeviceData) and \
+            obj.id == self.id and \
+            obj.clusterId == self.clusterId and \
+            obj.days == self.days and \
+            obj.months == self.months
+
+    def __str__(self):
+        return json.dumps(self)
 
     id = models.CharField(max_length=255, primary_key=True)
     clusterId = models.CharField(max_length=255)
