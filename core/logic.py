@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from core.models import DeviceData
 from collections import deque
 
@@ -37,8 +37,8 @@ def addPing(device: DeviceData):
     missingDates = getMissingDates(device)
     for date in missingDates:
         addNewSegmentToList(device, date, 0, 0)
-    addNewSegmentToList(device, datetime.now(), 100, 0)
 
+    addNewSegmentToList(device, datetime.now(), 100, 0)
     checkForOverflow(device, 0)
 
 def addNewSegmentToList(device, time, uptime, bucket):
@@ -116,11 +116,11 @@ def getMissingDates(device: DeviceData):
     elapsedTime = (now - lastUpdated['date']).total_seconds()
     missedIntervals = int(elapsedTime / timeBetweenPings)
 
-    return generateMissingSegments(lastUpdated['date'], missedIntervals - 1)
+    return generateMissingSegments(lastUpdated['date'], missedIntervals )
         
 def generateMissingSegments(startDate, number):
     data = []
-    for i in range(0, number):
-        data.append(startDate + datetime.timedelta(seconds=i * timeBetweenPings))
+    for i in range(1, number + 1):
+        data.append(startDate + timedelta(seconds=i * timeBetweenPings))
 
     return data
