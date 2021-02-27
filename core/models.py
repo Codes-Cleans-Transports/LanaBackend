@@ -15,7 +15,8 @@ class TimeData(models.Model):
 
 class TimeArray(models.Model):
     currentSequence = models.IntegerField(default=0)
-    overFlow = models.IntegerField(default=10)
+    overflow = models.IntegerField(default=10)
+    maxSize = models.IntegerField(default=60)
     data = models.ArrayField(
         model_container=TimeData
     )
@@ -28,19 +29,21 @@ class DeviceData(models.Model):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.days = {"currentSequence": 0, "overFlow": 10, "data": []}
+        self.buckets = [\
+            {"currentSequence": 0, "overflow": 10, "maxSize": 60, "data": []},\
+            {"currentSequence": 0, "overflow": 10, "maxSize": 60, "data": []},\
+        ]
 
     def __eq__(self, obj):
         return \
             isinstance(obj, DeviceData) and \
             obj.id == self.id and \
             obj.clusterId == self.clusterId and \
-            obj.days == self.days and \
-            obj.months == self.months
+            obj.buckets == self.buckets
 
     id = models.CharField(max_length=255, primary_key=True)
     clusterId = models.CharField(max_length=255)
-    days = models.EmbeddedField(
+    buckets = models.ArrayField(
         model_container=TimeArray
     )
     months = models.EmbeddedField(
