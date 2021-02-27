@@ -25,11 +25,7 @@ class DeviceData(models.Model):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.days = {"currentSequence": 1, "overFlow": 2, "data": []}
-        # self.days = TimeArray()
-        # self.days.data = []
-        # self.months = TimeArray()
-        # .months.data = []
+        self.days = {"currentSequence": 0, "overFlow": 10, "data": []}
 
     id = models.CharField(max_length=255, primary_key=True)
     clusterId = models.CharField(max_length=255)

@@ -1,4 +1,6 @@
 import datetime
+from core.models import DeviceData
+from collections import deque
 
 class DevicePing:
     def __init__(self, id: str, clusterId: str, location: str, date: datetime):
@@ -9,4 +11,21 @@ class DevicePing:
 
 
 def savePing(devicePing: DevicePing):
-    print(devicePing)
+    try:
+        device = DeviceData.objects.get(id = devicePing.id, clusterId = devicePing.clusterId)
+    except DeviceData.DoesNotExist as _:
+        device = createDevice(devicePing)
+
+    # addPing(device)
+    device.save()
+
+def addPing(device: DeviceData):
+    device
+    # if(device.days.currentSequence + 1 >= device.days.overFlow):
+    #     print("overflow")
+    # else:
+    #     q = dequeue(device.days.data)
+    #     q.pop()
+
+def createDevice(devicePing: DevicePing):
+    return DeviceData(devicePing.id, devicePing.clusterId)
