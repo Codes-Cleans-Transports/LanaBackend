@@ -8,7 +8,7 @@ burgas_points = 208
 
 
 def generate_data():
-    return [generate_sofia_data(), generate_varna_data(), generate_burgas_data()]
+    return generate_sofia_data() + generate_varna_data() + generate_burgas_data()
 
 
 def generate_sofia_data():
