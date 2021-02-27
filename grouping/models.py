@@ -10,16 +10,16 @@ class ClusterOwnershipRel(StructuredRel):
 
 class Device(StructuredNode):
     def __init__(self, average_uptime, location):
-        average_uptime = average_uptime
-        location = location
+        self.average_uptime = average_uptime
+        self.location = location
 
     parent_cluster = Relationship('Cluster', 'PARENTS', model=ClusterOwnershipRel)
 
 
 class Cluster(StructuredNode):
     def __init__(self, average_uptime, location, radius):
-        average_uptime = average_uptime
-        location = location
-        radius = radius
+        self.average_uptime = average_uptime
+        self.location = location
+        self.radius = radius
 
     parent_cluster = Relationship('Cluster', 'PARENTS', model=ClusterOwnershipRel)
