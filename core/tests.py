@@ -4,6 +4,8 @@ from core.logic import *
 import datetime
 from datetime import timedelta
 
+from core.logic import getDevicesByClusterAndBucketLevel
+
 import copy
 
 from unittest import mock
@@ -158,3 +160,33 @@ class CoreTestCase(TestCase):
         expected.buckets[2]['data'] = [{'uptime': 100, 'date': current_time}]
 
         self.assertEq(expected, device)
+
+
+class TestGetDevicesByClusterAndBucketLevel(TestCase):
+
+    def setUp(self):
+        self.current_time = datetime.datetime.now()
+
+        self.cluster_id = 1
+
+        devices = []
+
+        for i in range(0, 2):
+            devices.append(DeviceData(id=i, clusterId=self.cluster_id))
+
+        for device in devices:
+            overflow = device.buckets[0]['overflow']
+            device.buckets['currentSequence'] = overflow - 1
+            data = [{'uptime': 100, 'date': current_time}] * (overflow - 1)
+            device.buckets[0]['data'] = copy.deepcopy(data)
+
+            device.save()
+
+        self.service = getDevicesByClusterAndBucketLevel
+
+    def test_correct_data_returned(self):
+        devices_info = self.service(cluster_id=self.cluster_id, bucket_level=0)    
+
+        # self.assertEquals(len(devices_info), 3)
+        
+
