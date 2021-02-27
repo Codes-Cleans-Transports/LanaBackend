@@ -4,7 +4,7 @@ from core.logic import *
 import datetime
 from datetime import timedelta
 
-from core.logic import getDevicesByClusterAndBucketLevel
+from core.logic import getDevicesByClusterAndBucketLevel, createDevice, DevicePing
 
 import copy
 
@@ -47,16 +47,16 @@ class CoreTestCase(TestCase):
 
     @mock.patch("core.logic.datetime") 
     def test_addPingEmpty(self, datetime_mock):
+        location = '30.000 20.000'
+
         current_time = datetime.datetime.now()
         datetime_mock.now.return_value = current_time
 
-        device = DeviceData(id = "1", clusterId = "cl1")
-
+        device = createDevice(DevicePing(id="1", clusterId="cl1", location=location))
 
         addPing(device)
 
-
-        expected = DeviceData(id = "1", clusterId = "cl1")
+        expected = createDevice(DevicePing(id = "1", clusterId = "cl1", location=location))
         expected.buckets[0]['currentSequence'] = 1
         expected.buckets[0]['data'] = [{'uptime': 100, 'date': current_time}]
 
@@ -64,10 +64,12 @@ class CoreTestCase(TestCase):
 
     @mock.patch("core.logic.datetime")
     def test_addPingExisting(self, datetime_mock):
+        location = '30.000 20.000'
+
         current_time = datetime.datetime.now()
         datetime_mock.now.return_value = current_time
 
-        device = DeviceData(id = "1", clusterId = "cl1")
+        device = createDevice(DevicePing(id="1", clusterId="cl1", location=location))
         device.buckets[0]['currentSequence'] = 1
         device.buckets[0]['data'] = [{'uptime': 100, 'date': current_time}]
         
@@ -75,7 +77,7 @@ class CoreTestCase(TestCase):
         addPing(device)
 
 
-        expected = DeviceData(id = "1", clusterId = "cl1")
+        expected = createDevice(DevicePing(id="1", clusterId="cl1", location=location))
         expected.buckets[0]['currentSequence'] = 2
         expected.buckets[0]['data'] = [{'uptime': 100, 'date': current_time}, {'uptime': 100, 'date': current_time}]
 
@@ -83,10 +85,12 @@ class CoreTestCase(TestCase):
 
     @mock.patch("core.logic.datetime")
     def test_addPingRemovesIfFull(self, datetime_mock):
+        location = '30.000 20.000'
+
         current_time = datetime.datetime.now()
         datetime_mock.now.return_value = current_time
 
-        device = DeviceData(id = "1", clusterId = "cl1")
+        device = createDevice(DevicePing(id="1", clusterId="cl1", location=location))
         maxSize = device.buckets[0]['maxSize']
         data = [{'uptime': 100, 'date': current_time}] * maxSize
         device.buckets[0]['data'] = copy.deepcopy(data)
@@ -97,7 +101,7 @@ class CoreTestCase(TestCase):
 
         del data[0]
         data.append({'uptime': 100, 'date': current_time})
-        expected = DeviceData(id = "1", clusterId = "cl1")
+        expected = createDevice(DevicePing(id="1", clusterId="cl1", location=location))
         expected.buckets[0]['currentSequence'] = 1
         expected.buckets[0]['data'] = data
 
@@ -106,10 +110,12 @@ class CoreTestCase(TestCase):
 
     @mock.patch("core.logic.datetime")
     def test_addPingOverflows(self, datetime_mock):
+        location = '30.000 20.000'
+
         current_time = datetime.datetime.now()
         datetime_mock.now.return_value = current_time
 
-        device = DeviceData(id = "1", clusterId = "cl1")
+        device = createDevice(DevicePing(id="1", clusterId="cl1", location=location))
         overflow = device.buckets[0]['overflow']
         device.buckets[0]['currentSequence'] = overflow - 1
         data = [{'uptime': 100, 'date': current_time}] * (overflow - 1)
@@ -120,7 +126,7 @@ class CoreTestCase(TestCase):
 
 
         data.append({'uptime': 100, 'date': current_time})
-        expected = DeviceData(id = "1", clusterId = "cl1")
+        expected = createDevice(DevicePing(id="1", clusterId="cl1", location=location))
 
         expected.buckets[0]['currentSequence'] = 0
         expected.buckets[0]['data'] = data
@@ -131,10 +137,12 @@ class CoreTestCase(TestCase):
 
     @mock.patch("core.logic.datetime")
     def test_addPingOverflowsMultipleBuckets(self, datetime_mock):
+        location = '30.000 20.000'
+
         current_time = datetime.datetime.now()
         datetime_mock.now.return_value = current_time
 
-        device = DeviceData(id = "1", clusterId = "cl1")
+        device = createDevice(DevicePing(id="1", clusterId="cl1", location=location))
 
         overflowFirstBucket = device.buckets[0]['overflow']
         data = [{'uptime': 100, 'date': current_time}] * (overflowFirstBucket - 1)
@@ -151,7 +159,7 @@ class CoreTestCase(TestCase):
 
 
         data.append({'uptime': 100, 'date': current_time})
-        expected = DeviceData(id = "1", clusterId = "cl1")
+        expected = createDevice(DevicePing(id="1", clusterId="cl1", location=location))
         expected.buckets[0]['currentSequence'] = 0
         expected.buckets[0]['data'] = data
         expected.buckets[1]['currentSequence'] = 0
@@ -165,19 +173,22 @@ class CoreTestCase(TestCase):
 class TestGetDevicesByClusterAndBucketLevel(TestCase):
 
     def setUp(self):
+        location = '30.000 20.000'
+
         self.current_time = datetime.datetime.now()
 
         self.cluster_id = 1
 
         devices = []
 
-        for i in range(0, 2):
-            devices.append(DeviceData(id=i, clusterId=self.cluster_id))
+        for i in range(0, 3):
+            device = createDevice(DevicePing(id=i, clusterId=self.cluster_id, location=location))
+            devices.append(device)
 
         for device in devices:
             overflow = device.buckets[0]['overflow']
-            device.buckets['currentSequence'] = overflow - 1
-            data = [{'uptime': 100, 'date': current_time}] * (overflow - 1)
+            device.buckets[0]['currentSequence'] = overflow - 1
+            data = [{'uptime': 100, 'date': self.current_time}] * (overflow - 1)
             device.buckets[0]['data'] = copy.deepcopy(data)
 
             device.save()
@@ -185,8 +196,11 @@ class TestGetDevicesByClusterAndBucketLevel(TestCase):
         self.service = getDevicesByClusterAndBucketLevel
 
     def test_correct_data_returned(self):
-        devices_info = self.service(cluster_id=self.cluster_id, bucket_level=0)    
+        devices_info = self.service(cluster_id=self.cluster_id, bucket_level=0)
 
-        # self.assertEquals(len(devices_info), 3)
+        self.assertEquals(len(devices_info), 3)
+
+        for device in devices_info:
+            self.assertEquals(device.cluster_id, self.cluster_id)
         
 
