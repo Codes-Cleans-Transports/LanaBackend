@@ -20,12 +20,19 @@ def savePing(devicePing: DevicePing):
     device.save()
 
 def addPing(device: DeviceData):
-    device
-    # if(device.days.currentSequence + 1 >= device.days.overFlow):
-    #     print("overflow")
-    # else:
-    #     q = dequeue(device.days.data)
-    #     q.pop()
+    overflow = device.days['overFlow']
+
+    if(device.days['currentSequence'] + 1 >= overflow):
+        print("overflow")
+    else:
+        q = deque(device.days['data'])
+
+        if(q.count == overflow):
+            q.pop()
+
+        data = {'uptime': 100, 'date': datetime.datetime.now()}
+        q.append(data)
+        device.days['data'] = list(q)
 
 def createDevice(devicePing: DevicePing):
     return DeviceData(devicePing.id, devicePing.clusterId)
