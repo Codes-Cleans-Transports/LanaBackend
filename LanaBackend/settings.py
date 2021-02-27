@@ -31,8 +31,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
-NEOMODEL_NEO4J_BOLT_URL = os.environ.get('NEO4J_BOLT_URL', 'bolt://neo4j:test@localhost:7687')
-
+config.DATABASE_URL = 'bolt://neo4j:lana@18.196.81.140:7687'
 
 # Application definition
 
