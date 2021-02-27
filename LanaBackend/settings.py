@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'core',
     'interface',
     'django_extensions',
-    'grouping'
+    'grouping',
+    'datageneration'
 ]
 
 MIDDLEWARE = [
