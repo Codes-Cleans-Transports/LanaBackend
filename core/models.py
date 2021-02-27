@@ -8,9 +8,10 @@ from neomodel import *
 class TimeData(models.Model):
     uptime = models.DecimalField()
     date = models.DateTimeField()
-    
+
     class Meta:
         abstract = True
+
 
 class TimeArray(models.Model):
     currentSequence = models.IntegerField(default=0)
@@ -22,12 +23,12 @@ class TimeArray(models.Model):
     class Meta:
         abstract = True
 
+
 class DeviceData(models.Model):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.days = {"currentSequence": 0, "overFlow": 10, "data": []}
-
 
     def __eq__(self, obj):
         return \
@@ -49,16 +50,23 @@ class DeviceData(models.Model):
         model_container=TimeArray
     )
 
+
 class ClusterOwnershipRel(StructuredRel):
     pass
 
+
 class Device(StructuredNode):
     last_hour_uptime = FloatProperty(default=100)
+
+    location = []
 
     parent_cluster = Relationship('Cluster', 'PARENTS', model=ClusterOwnershipRel)
 
 
 class Cluster(StructuredNode):
-    average_uptime = FloatProperty(default=100)
+    def __init__(self, average_uptime, location, radius):
+        average_uptime = average_uptime
+        location = location
+        radius = radius
 
     parent_cluster = Relationship('Cluster', 'PARENTS', model=ClusterOwnershipRel)
