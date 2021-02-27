@@ -158,3 +158,36 @@ class CoreTestCase(TestCase):
         expected.buckets[2]['data'] = [{'uptime': 100, 'date': current_time}]
 
         self.assertEq(expected, device)
+
+
+    @mock.patch("core.logic.datetime")
+    def test_addMissingPings(self, datetime_mock):
+        current_time = datetime.datetime.now()
+        datetime_mock.now.return_value = current_time
+
+        device = DeviceData(id = "1", clusterId = "cl1")
+
+        overflowFirstBucket = device.buckets[0]['overflow']
+        data = [{'uptime': 100, 'date': current_time}] * (overflowFirstBucket - 1)
+        device.buckets[0]['currentSequence'] = overflowFirstBucket - 1
+        device.buckets[0]['data'] = copy.deepcopy(data)
+
+        overflowSecondBucket = device.buckets[1]['overflow']
+        data = [{'uptime': 100, 'date': current_time}] * (overflowSecondBucket - 1)
+        device.buckets[1]['currentSequence'] = overflowSecondBucket - 1
+        device.buckets[1]['data'] = copy.deepcopy(data)
+        
+
+        addPing(device)
+
+
+        data.append({'uptime': 100, 'date': current_time})
+        expected = DeviceData(id = "1", clusterId = "cl1")
+        expected.buckets[0]['currentSequence'] = 0
+        expected.buckets[0]['data'] = data
+        expected.buckets[1]['currentSequence'] = 0
+        expected.buckets[1]['data'] = data
+        expected.buckets[2]['currentSequence'] = 1
+        expected.buckets[2]['data'] = [{'uptime': 100, 'date': current_time}]
+
+        self.assertEq(expected, device)
