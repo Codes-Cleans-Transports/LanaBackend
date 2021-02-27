@@ -44,6 +44,7 @@ class DeviceData(models.Model):
 
     id = models.CharField(max_length=255, primary_key=True)
     clusterId = models.CharField(max_length=255)
+    location = models.CharField(max_length=255)
     buckets = models.ArrayField(
         model_container=TimeArray
     )
