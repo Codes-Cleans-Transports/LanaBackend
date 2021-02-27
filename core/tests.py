@@ -16,16 +16,17 @@ class CoreTestCase(TestCase):
     def assertEq(self, obj1, obj2):
         self.assertEquals(obj1.id, obj2.id)
         self.assertEquals(obj1.clusterId, obj2.clusterId)
-        self.assertEquals(obj1.days['data'], obj2.days['data'])
-        self.assertEquals(obj1.days['currentSequence'], obj2.days['currentSequence'])
-        self.assertEquals(obj1.days['overFlow'], obj2.days['overFlow'])
+        self.assertEquals(obj1.buckets[0]['data'], obj2.buckets[0]['data'])
+        self.assertEquals(obj1.buckets[0]['currentSequence'], obj2.buckets[0]['currentSequence'])
+        self.assertEquals(obj1.buckets[0]['overflow'], obj2.buckets[0]['overflow'])
+        self.assertEquals(obj1.buckets[0]['maxSize'], obj2.buckets[0]['maxSize'])
         self.assertEquals(obj1, obj2)
 
     def test_MongodbSave(self):
         device = DeviceData(id = "1", clusterId = "cl1")
         device.save()
-        # device.days = TimeArray()
-        # device.days.data = [{'uptime': 0.1, 'date': str(datetime.datetime.now())}]
+        # device.buckets[0] = TimeArray()
+        # device.buckets[0].data = [{'uptime': 0.1, 'date': str(datetime.datetime.now())}]
         
         # device.save()
         savedDevice = DeviceData.objects.get(id = '1')
@@ -49,8 +50,8 @@ class CoreTestCase(TestCase):
         addPing(device)
 
         expected = DeviceData(id = "1", clusterId = "cl1")
-        expected.days['currentSequence'] = 1
-        expected.days['data'] = [{'uptime': 100, 'date': current_time}]
+        expected.buckets[0]['currentSequence'] = 1
+        expected.buckets[0]['data'] = [{'uptime': 100, 'date': current_time}]
 
         self.assertEq(expected, device)
 
@@ -60,14 +61,14 @@ class CoreTestCase(TestCase):
         datetime_mock.now.return_value = current_time
 
         device = DeviceData(id = "1", clusterId = "cl1")
-        device.days['currentSequence'] = 1
-        device.days['data'] = [{'uptime': 100, 'date': current_time}]
+        device.buckets[0]['currentSequence'] = 1
+        device.buckets[0]['data'] = [{'uptime': 100, 'date': current_time}]
         
         addPing(device)
 
         expected = DeviceData(id = "1", clusterId = "cl1")
-        expected.days['currentSequence'] = 2
-        expected.days['data'] = [{'uptime': 100, 'date': current_time}, {'uptime': 100, 'date': current_time}]
+        expected.buckets[0]['currentSequence'] = 2
+        expected.buckets[0]['data'] = [{'uptime': 100, 'date': current_time}, {'uptime': 100, 'date': current_time}]
 
         self.assertEq(expected, device)
 
@@ -77,18 +78,17 @@ class CoreTestCase(TestCase):
         datetime_mock.now.return_value = current_time
 
         device = DeviceData(id = "1", clusterId = "cl1")
-        overflow = device.days['overFlow']
-        # device.days['currentSequence'] = overflow - 1
-        data = [{'uptime': 100, 'date': current_time}] * overflow
-        device.days['data'] = copy.deepcopy(data)
+        maxSize = device.buckets[0]['maxSize']
+        data = [{'uptime': 100, 'date': current_time}] * maxSize
+        device.buckets[0]['data'] = copy.deepcopy(data)
         
         addPing(device)
 
         expected = DeviceData(id = "1", clusterId = "cl1")
-        expected.days['currentSequence'] = 1
+        expected.buckets[0]['currentSequence'] = 1
         del data[0]
         data.append({'uptime': 100, 'date': current_time})
-        expected.days['data'] = data
+        expected.buckets[0]['data'] = data
 
         self.assertEq(expected, device)
 
@@ -99,16 +99,16 @@ class CoreTestCase(TestCase):
         datetime_mock.now.return_value = current_time
 
         device = DeviceData(id = "1", clusterId = "cl1")
-        overflow = device.days['overFlow']
-        device.days['currentSequence'] = overflow - 1
+        overflow = device.buckets[0]['overflow']
+        device.buckets[0]['currentSequence'] = overflow - 1
         data = [{'uptime': 100, 'date': current_time}] * (overflow - 1)
-        device.days['data'] = copy.deepcopy(data)
+        device.buckets[0]['data'] = copy.deepcopy(data)
         
         addPing(device)
 
         expected = DeviceData(id = "1", clusterId = "cl1")
-        expected.days['currentSequence'] = 0
+        expected.buckets[0]['currentSequence'] = 0
         data.append({'uptime': 100, 'date': current_time})
-        expected.days['data'] = data
+        expected.buckets[0]['data'] = data
 
         self.assertEq(expected, device)

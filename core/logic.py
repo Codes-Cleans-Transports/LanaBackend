@@ -9,7 +9,6 @@ class DevicePing:
         self.location = location
         self.date = date
 
-
 def acceptPing(devicePing: DevicePing):
     try:
         device = DeviceData.objects.get(id = devicePing.id, clusterId = devicePing.clusterId)
@@ -22,23 +21,23 @@ def acceptPing(devicePing: DevicePing):
 def addPing(device: DeviceData):
     addNewSegmentToList(device, 100)
 
-    if(device.days['currentSequence'] == device.days['overFlow']):
+    if(device.buckets[0]['currentSequence'] == device.buckets[0]['overflow']):
         overflow(device)
 
 def addNewSegmentToList(device, uptime):
-    overflow = device.days['overFlow']
-    q = deque(device.days['data'])
+    maxSize = device.buckets[0]['maxSize']
+    q = deque(device.buckets[0]['data'])
 
-    if(len(q) == overflow):
+    if(len(q) == maxSize):
         q.pop()
 
     data = {'uptime': 100, 'date': datetime.now()}
     q.append(data)
-    device.days['currentSequence'] += 1
-    device.days['data'] = list(q)
+    device.buckets[0]['currentSequence'] += 1
+    device.buckets[0]['data'] = list(q)
 
 def overflow(device):
-    device.days['currentSequence'] = 0
+    device.buckets[0]['currentSequence'] = 0
 
 def createDevice(devicePing: DevicePing):
     return DeviceData(devicePing.id, devicePing.clusterId)
