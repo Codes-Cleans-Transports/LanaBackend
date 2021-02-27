@@ -27,14 +27,6 @@ class TimeArray(models.Model):
 
 class DeviceData(models.Model):
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.buckets = [ \
-            {"currentSequence": 0, "overflow": 10, "maxSize": 60, "data": []}, \
-            {"currentSequence": 0, "overflow": 10, "maxSize": 60, "data": []}, \
-            {"currentSequence": 0, "overflow": 10, "maxSize": 60, "data": []}, \
-        ]
-
     def __eq__(self, obj):
         return \
             isinstance(obj, DeviceData) and \
