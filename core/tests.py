@@ -91,3 +91,24 @@ class CoreTestCase(TestCase):
         expected.days['data'] = data
 
         self.assertEq(expected, device)
+
+
+    @mock.patch("core.logic.datetime")
+    def test_addPingOverflows(self, datetime_mock):
+        current_time = datetime.datetime.now()
+        datetime_mock.now.return_value = current_time
+
+        device = DeviceData(id = "1", clusterId = "cl1")
+        overflow = device.days['overFlow']
+        device.days['currentSequence'] = overflow - 1
+        data = [{'uptime': 100, 'date': current_time}] * (overflow - 1)
+        device.days['data'] = copy.deepcopy(data)
+        
+        addPing(device)
+
+        expected = DeviceData(id = "1", clusterId = "cl1")
+        expected.days['currentSequence'] = 0
+        data.append({'uptime': 100, 'date': current_time})
+        expected.days['data'] = data
+
+        self.assertEq(expected, device)

@@ -38,7 +38,7 @@ def addNewSegmentToList(device, uptime):
     device.days['data'] = list(q)
 
 def overflow(device):
-    device.days['currentSequence'] = 1
+    device.days['currentSequence'] = 0
 
 def createDevice(devicePing: DevicePing):
     return DeviceData(devicePing.id, devicePing.clusterId)
