@@ -2,12 +2,21 @@ from datetime import datetime
 from core.models import DeviceData
 from collections import deque
 
+from typing import List
+
 class DevicePing:
     def __init__(self, id: str, clusterId: str, location: str, date: datetime):
         self.id = id
         self.clusterId = clusterId
         self.location = location
         self.date = date
+
+class DeviceInfo:
+    def __init__(self, id: str, cluster_id: str, location: str, uptime: float):
+        self.id = id
+        self.cluster_id = cluster_id
+        self.location = location
+        self.uptime = uptime
 
 def acceptPing(devicePing: DevicePing):
     try:
@@ -61,3 +70,25 @@ def Average(lst):
 
 def createDevice(devicePing: DevicePing):
     return DeviceData(devicePing.id, devicePing.clusterId)
+
+def getDevicesByClusterAndBucketLevel(
+    *,
+    cluster_id: str,
+    bucket_level: int 
+) -> List[DeviceInfo]:
+    devices = []
+
+    # TODO: Determine if "location" is a str in the form "52.321321 32.3332312" or an object with long/lat fields
+    for device in DeviceData.objects.filter(clusterId=cluster_id):
+        devices.append(
+            DeviceInfo(
+                id=device.id,
+                cluster_id=cluster_id,
+                location=device.location,
+                uptime=device.buckets[bucket_level].data[0].uptime
+            )
+        )
+
+    return devices
+    
+    
