@@ -6,7 +6,7 @@ from sklearn.cluster import KMeans
 
 
 def get_clusters(nodes: [], k):
-
+    # Fix circular import
     from core.logic import Node
 
     kmean = KMeans(n_clusters=k)
