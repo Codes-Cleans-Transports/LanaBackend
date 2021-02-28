@@ -15,7 +15,7 @@ def generate_sofia_data():
     sofia_local_data = generate_sofia_location_data()
     sofia_bucket_data = []
     for i in range(sofia_points):
-            sofia_bucket_data.append([])
+        sofia_bucket_data.append([])
         for j in range(80):
             sofia_bucket_data[i].append(random() * 20 + 80)
     sofia_data = []
