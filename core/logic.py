@@ -124,3 +124,6 @@ def generateMissingSegments(startDate, number):
         data.append(startDate + timedelta(seconds=i * timeBetweenPings))
 
     return data
+
+def getClusters():
+    return list(DeviceData.objects.all().values('clusterId').distinct().values_list('clusterId', flat=True))
