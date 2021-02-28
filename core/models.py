@@ -6,7 +6,7 @@ from neomodel import *
 
 
 class TimeData(models.Model):
-    uptime = models.DecimalField()
+    uptime = models.FloatField()
     date = models.DateTimeField()
 
     class Meta:
