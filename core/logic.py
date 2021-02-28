@@ -31,19 +31,8 @@ class Node:
         self.y = y
         self.average_uptime = average_uptime
         self.children = children
-
-    def __str__(self):
-        return {
-            "lat": str(self.x),
-            "lon": str(self.y),
-            "uptime": str(self.average_uptime),
-            "children": [str(children)],
-            "radius": str(radius)
-        }
-
-
+   
 timeBetweenPings = 60
-
 
 def acceptPing(devicePing: DevicePing):
     try:
