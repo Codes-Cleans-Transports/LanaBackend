@@ -4,7 +4,7 @@ from datetime import datetime
 from rest_framework import views, serializers
 from rest_framework.response import Response
 
-from core.logic import acceptPing, DevicePing
+from core.logic import acceptPing, DevicePing, getClusters
 
 # Create your views here.
 
@@ -18,13 +18,18 @@ class CreatePingView(views.APIView):
         input_serializer = self.InputSerializer(data=request.data)
         input_serializer.is_valid()
 
-        acceptPing(DevicePing(id=device_id, clusterId=cluster_id, location=input_serializer['location']))
+        acceptPing(DevicePing(id=device_id, clusterId=cluster_id, location=input_serializer.data['location']))
 
         return Response()
 
 
-class GetPingsView(views.APIView):
+class GetClusterView(views.APIView):
+
+    def get(self, request, cluster_id):
+        
+        return Response()
+
+class ListClustersView(views.APIView):
 
     def get(self, request):
-
-        return Response()
+        return Response(data=getClusters())
