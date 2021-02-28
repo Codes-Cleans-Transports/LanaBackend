@@ -4,7 +4,6 @@ import numpy
 from sklearn.cluster import KMeans
 
 
-
 def get_clusters(nodes: [], k):
     # Fix circular import
     from core.logic import Node
@@ -12,7 +11,8 @@ def get_clusters(nodes: [], k):
     kmean = KMeans(n_clusters=k)
     locations = []
     for i in nodes:
-        locations.append(i.location)
+        location = [i.x, i.y]
+        locations.append(location)
     kmean.fit(locations)
     clusters_sum = numpy.ones(k)
     clusters_number = numpy.ones(k)
@@ -22,15 +22,13 @@ def get_clusters(nodes: [], k):
 
     for i in range(k):
         cluster_children.append([])
- 
-
 
     for i in range(len(nodes)):
         clusters_sum[kmean.labels_[i]] += nodes[i].average_uptime
         clusters_number[kmean.labels_[i]] += 1
         cluster_children[kmean.labels_[i]] = []
         if not nodes[i].children:
-            cluster_children[kmean.labels_[i]].append(nodes[i])]
+            cluster_children[kmean.labels_[i]].append(nodes[i])
         else:
             cluster_children[kmean.labels_[i]] += nodes[i].children
         x1 = locations[i][0]
