@@ -32,7 +32,7 @@ def generate_varna_data():
     varna_bucket_data = [[0 for x in range(40)] for y in range(varna_points)]
     for i in range(varna_points):
         for j in range(40):
-            varna_bucket_data[i].append(random() * 100)
+            varna_bucket_data[i].append(random() * 20 + 80)
     varna_data = []
     for i in range(varna_points):
         varna_data.append(DeviceData(id=1,
@@ -48,7 +48,7 @@ def generate_burgas_data():
     burgas_bucket_data = [[0 for x in range(40)] for y in range(burgas_points)]
     for i in range(burgas_points):
         for j in range(40):
-            burgas_bucket_data[i].append(random() * 100)
+            burgas_bucket_data[i].append(random() * 20 + 80)
     burgas_data = []
     for i in range(burgas_points):
         burgas_data.append(DeviceData(id=1,
