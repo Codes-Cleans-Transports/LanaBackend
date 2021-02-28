@@ -86,10 +86,18 @@ def Average(lst):
 
 def createDevice(devicePing: DevicePing):
     device = DeviceData(devicePing.id, devicePing.clusterId)
+
     device.buckets = [ \
-        {"currentSequence": 0, "overflow": 10, "maxSize": 60, "data": []}, \
-        {"currentSequence": 0, "overflow": 10, "maxSize": 60, "data": []}, \
-        {"currentSequence": 0, "overflow": 10, "maxSize": 60, "data": []}, \
+        # 60 seconds, overflow every hour hold up to 6 hours
+        {"currentSequence": 0, "overflow": 60, "maxSize": 60*6, "data": []}, \
+        # Overflow every 24 pings/hours hold up to 7 days
+        {"currentSequence": 0, "overflow": 24, "maxSize": 7*24, "data": []}, \
+        # Overflow every 7 pings/1 week hold up to 5 weeks
+        {"currentSequence": 0, "overflow": 7, "maxSize": 7*5, "data": []}, \
+        # Overflow every 4 weeks hold up to 3 months
+        {"currentSequence": 0, "overflow": 4, "maxSize": 4*3, "data": []}, \
+        # Overflow every 3 months hold up to a year
+        {"currentSequence": 0, "overflow": 3, "maxSize": 3*4, "data": []}, \
     ]
 
     return device
