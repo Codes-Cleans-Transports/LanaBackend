@@ -17,6 +17,13 @@ class DeviceInfo:
         self.location = location
         self.uptime = uptime
 
+class Node:
+    # Children is a list of nodes
+    def __init__(self, location: str, average_uptime: float, children, radius: int):
+        self.location = list(map(float, location.split(' ')))
+        self.average_uptime = average_uptime
+        self.children = children
+
 
 timeBetweenPings = 60
 
@@ -84,10 +91,18 @@ def Average(lst):
 
 def createDevice(devicePing: DevicePing):
     device = DeviceData(devicePing.id, devicePing.clusterId)
+
     device.buckets = [ \
-        {"currentSequence": 0, "overflow": 10, "maxSize": 60, "data": []}, \
-        {"currentSequence": 0, "overflow": 10, "maxSize": 60, "data": []}, \
-        {"currentSequence": 0, "overflow": 10, "maxSize": 60, "data": []}, \
+        # 60 seconds, overflow every hour hold up to 6 hours
+        {"currentSequence": 0, "overflow": 60, "maxSize": 60*6, "data": []}, \
+        # Overflow every 24 pings/hours hold up to 7 days
+        {"currentSequence": 0, "overflow": 24, "maxSize": 7*24, "data": []}, \
+        # Overflow every 7 pings/1 week hold up to 5 weeks
+        {"currentSequence": 0, "overflow": 7, "maxSize": 7*5, "data": []}, \
+        # Overflow every 4 weeks hold up to 3 months
+        {"currentSequence": 0, "overflow": 4, "maxSize": 4*3, "data": []}, \
+        # Overflow every 3 months hold up to a year
+        {"currentSequence": 0, "overflow": 3, "maxSize": 3*4, "data": []}, \
     ]
 
     return device
@@ -129,3 +144,26 @@ def generateMissingSegments(startDate, number):
         data.append(startDate + timedelta(seconds=i * timeBetweenPings))
 
     return data
+
+def getClusterGrouped(
+    *,
+    cluster_id: str
+) -> List[Node]:
+    devices = getDevicesByClusterAndBucketLevel(cluster_id=cluster_id, bucket_level=0)
+    nodes = []
+
+    roots = []
+
+    for device in devices:
+        Node(location=device.location, lifetime=device.lifetime, children=None)
+
+    for i in range(8):
+        # TODO: Trigger KMeans and generate Nodes from Nodes
+        # TODO: Construct the n-dimensional array that will hold the groups
+        pass
+
+    return roots
+
+
+def getClusters():
+    return list(DeviceData.objects.all().values('clusterId').distinct().values_list('clusterId', flat=True))

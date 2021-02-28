@@ -133,25 +133,26 @@ class CoreTestCase(TestCase):
         device = createDevice(DevicePing(id="1", clusterId="cl1", location=location))
 
         overflowFirstBucket = device.buckets[0]['overflow']
-        data = [{'uptime': 100, 'date': current_time}] * (overflowFirstBucket - 1)
+        data1 = [{'uptime': 100, 'date': current_time}] * (overflowFirstBucket - 1)
         device.buckets[0]['currentSequence'] = overflowFirstBucket - 1
-        device.buckets[0]['data'] = copy.deepcopy(data)
+        device.buckets[0]['data'] = copy.deepcopy(data1)
 
         overflowSecondBucket = device.buckets[1]['overflow']
-        data = [{'uptime': 100, 'date': current_time}] * (overflowSecondBucket - 1)
+        data2 = [{'uptime': 100, 'date': current_time}] * (overflowSecondBucket - 1)
         device.buckets[1]['currentSequence'] = overflowSecondBucket - 1
-        device.buckets[1]['data'] = copy.deepcopy(data)
+        device.buckets[1]['data'] = copy.deepcopy(data2)
         
 
         addPing(device)
 
 
-        data.append({'uptime': 100, 'date': current_time})
+        data1.append({'uptime': 100, 'date': current_time})
+        data2.append({'uptime': 100, 'date': current_time})
         expected = createDevice(DevicePing(id="1", clusterId="cl1", location=location))
         expected.buckets[0]['currentSequence'] = 0
-        expected.buckets[0]['data'] = data
+        expected.buckets[0]['data'] = data1
         expected.buckets[1]['currentSequence'] = 0
-        expected.buckets[1]['data'] = data
+        expected.buckets[1]['data'] = data2
         expected.buckets[2]['currentSequence'] = 1
         expected.buckets[2]['data'] = [{'uptime': 100, 'date': current_time}]
 
