@@ -15,7 +15,7 @@ def generate_sofia_data():
     sofia_local_data = generate_sofia_location_data()
     sofia_bucket_data = [[0 for x in range(40)] for y in range(sofia_points)]
     for i in range(sofia_points):
-        for j in range(40):
+        for j in range(60):
             sofia_bucket_data[i].append(random() * 20 + 80)
     sofia_data = []
     for i in range(sofia_points):
@@ -31,7 +31,7 @@ def generate_varna_data():
     varna_local_data = generate_varna_location_data()
     varna_bucket_data = [[0 for x in range(40)] for y in range(varna_points)]
     for i in range(varna_points):
-        for j in range(40):
+        for j in range(60):
             varna_bucket_data[i].append(random() * 20 + 80)
     varna_data = []
     for i in range(varna_points):
@@ -47,7 +47,7 @@ def generate_burgas_data():
     burgas_local_data = generate_burgas_location_data()
     burgas_bucket_data = [[0 for x in range(40)] for y in range(burgas_points)]
     for i in range(burgas_points):
-        for j in range(40):
+        for j in range(60):
             burgas_bucket_data[i].append(random() * 20 + 80)
     burgas_data = []
     for i in range(burgas_points):
