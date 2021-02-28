@@ -22,7 +22,7 @@ class DeviceInfo:
 class Node:
     # Children is a list of nodes
     def __init__(self, location: str, average_uptime: float, children, radius: int):
-        self.location = list(map(float, location.split(' ')))
+        self.location = tuple(map(float, location[1:][:-1].split(', ')))
         self.average_uptime = average_uptime
         self.children = children
 
