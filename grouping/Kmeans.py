@@ -45,7 +45,8 @@ def get_clusters(nodes: [], k):
     final_nodes = []
 
     for i in range(k):
-        final_nodes.append(Node(location=kmean.cluster_centers_[i],
+        final_nodes.append(Node(x=kmean.cluster_centers_[i][0],
+                                y=kmean.cluster_centers_[i][1],
                                 average_uptime=cluster_uptime[i],
                                 radius=cluster_radius[i],
                                 children=cluster_children[i],
