@@ -175,7 +175,7 @@ def getClusterGrouped(
     nodes = []
 
     for device in devices:
-        location = tuple(map(float, location[1:][:-1].split(', ')))
+        location = tuple(map(float, device.location[1:][:-1].split(', ')))
         nodes.append(Node(x=location[0], y=location[1], average_uptime=device.uptime, children=None, radius=0))
 
     k = len(nodes)
