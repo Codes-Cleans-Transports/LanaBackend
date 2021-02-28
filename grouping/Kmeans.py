@@ -18,13 +18,19 @@ def get_clusters(nodes: [], k):
     clusters_number = numpy.ones(k)
     cluster_uptime = numpy.ones(k)
     cluster_radius = numpy.ones(k)
-    cluster_children = numpy.ones(k)
+    cluster_children = []
+
+    for i in range(k):
+        cluster_children.append([])
+ 
+
 
     for i in range(len(nodes)):
         clusters_sum[kmean.labels_[i]] += nodes[i].average_uptime
         clusters_number[kmean.labels_[i]] += 1
+        cluster_children[kmean.labels_[i]] = []
         if not nodes[i].children:
-            cluster_children[kmean.labels_[i]] += nodes[i]
+            cluster_children[kmean.labels_[i]].append(nodes[i])]
         else:
             cluster_children[kmean.labels_[i]] += nodes[i].children
         x1 = locations[i][0]
