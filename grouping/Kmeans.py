@@ -26,11 +26,7 @@ def get_clusters(nodes: [], k):
     for i in range(len(nodes)):
         clusters_sum[kmean.labels_[i]] += nodes[i].average_uptime
         clusters_number[kmean.labels_[i]] += 1
-        cluster_children[kmean.labels_[i]] = []
-        if not nodes[i].children:
-            cluster_children[kmean.labels_[i]].append(nodes[i])
-        else:
-            cluster_children[kmean.labels_[i]] += nodes[i].children
+        cluster_children[kmean.labels_[i]].append(nodes[i])
         x1 = locations[i][0]
         y1 = locations[i][1]
         x2 = kmean.cluster_centers_[kmean.labels_[i]][0]
@@ -45,7 +41,8 @@ def get_clusters(nodes: [], k):
     final_nodes = []
 
     for i in range(k):
-        final_nodes.append(Node(location=kmean.cluster_centers_[i],
+        final_nodes.append(Node(x=kmean.cluster_centers_[i][0],
+                                y=kmean.cluster_centers_[i][1],
                                 average_uptime=cluster_uptime[i],
                                 radius=cluster_radius[i],
                                 children=cluster_children[i],
