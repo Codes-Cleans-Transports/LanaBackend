@@ -1,7 +1,7 @@
 import math
 
 import numpy
-from sklearn.cluster import KMeans
+# from sklearn.cluster import KMeans
 
 
 def get_clusters(nodes: [], k):
@@ -36,7 +36,7 @@ def get_clusters(nodes: [], k):
             cluster_radius[kmean.labels_[i]] = distance
 
     for i in range(k):
-        cluster_uptime[i] = clusters_sum[i] / clusters_number[i]
+        cluster_uptime[i] = clusters_sum[i] / (clusters_number[i] - 1)
 
     final_nodes = []
 
