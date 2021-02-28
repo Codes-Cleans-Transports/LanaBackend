@@ -170,7 +170,7 @@ def getClusterGrouped(
 ) -> List[Node]:
     devices = getDevicesByClusterAndBucketLevel(cluster_id=cluster_id, bucket_level=0)
 
-    nodes = []
+    levels = []
 
     for device in devices:
         location = tuple(map(float, device.location[1:][:-1].split(', ')))
@@ -178,11 +178,14 @@ def getClusterGrouped(
 
     k = len(nodes)
 
-    for i in range(6):
-        nodes = get_clusters(nodes=nodes, k=k)
-        k = ceil(k / 3)
+    levels.append(nodes)
 
-    return nodes
+    for i in range(6):
+        nodes = get_clusters(nodes=levels[-1], k=k)
+        k = ceil(k / 3)
+        levels.append(nodes)
+
+    return levels
 
 
 def getClusters():
