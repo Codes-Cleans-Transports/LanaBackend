@@ -156,7 +156,7 @@ def getClusterGrouped(
     nodes = []
 
     for device in devices:
-        nodes.append(Node(location=device.location, lifetime=device.lifetime, children=None))
+        nodes.append(Node(location=device.location, lifetime=device.uptime, children=None))
 
     k = 930
 
