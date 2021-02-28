@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from core.logic import acceptPing, DevicePing, getClusters, getClusterGrouped
 
 import jsonpickle
+import json
 
 # Create your views here.
 
@@ -31,7 +32,7 @@ class GetClusterView(views.APIView):
 
         nodes = getClusterGrouped(cluster_id=cluster_id)
         
-        return Response(data=jsonpickle.encode(nodes))
+        return Response(data=json.loads(jsonpickle.encode(nodes, unpicklable=False)))
 
 class ListClustersView(views.APIView):
 
