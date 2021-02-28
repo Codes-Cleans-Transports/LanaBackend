@@ -29,6 +29,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
+CORS_ORIGIN_ALLOW_ALL = True
+
 config.DATABASE_URL = 'bolt://neo4j:lana@18.196.81.140:7687'
 
 # Application definition
@@ -45,7 +47,8 @@ INSTALLED_APPS = [
     'interface',
     'django_extensions',
     'grouping',
-    'datageneration'
+    'datageneration',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -56,6 +59,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'LanaBackend.urls'
