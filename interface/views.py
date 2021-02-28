@@ -4,7 +4,9 @@ from datetime import datetime
 from rest_framework import views, serializers
 from rest_framework.response import Response
 
-from core.logic import acceptPing, DevicePing, getClusters
+from core.logic import acceptPing, DevicePing, getClusters, getClusterGrouped
+
+import jsonpickle
 
 # Create your views here.
 
@@ -26,8 +28,10 @@ class CreatePingView(views.APIView):
 class GetClusterView(views.APIView):
 
     def get(self, request, cluster_id):
+
+        nodes = getClusterGrouped(cluster_id=cluster_id)
         
-        return Response()
+        return Response(data=jsonpickle.encode(nodes))
 
 class ListClustersView(views.APIView):
 
