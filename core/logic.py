@@ -27,9 +27,9 @@ class DeviceInfo:
 class Node:
     # Children is a list of nodes
     def __init__(self, x: float, y: float, average_uptime: float, children, radius: int):
-        self.x = x
-        self.y = y
-        self.average_uptime = average_uptime
+        self.x = str(x)
+        self.y = str(y)
+        self.average_uptime = str(average_uptime)
         self.children = children
    
 timeBetweenPings = 60
