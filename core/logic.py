@@ -21,8 +21,9 @@ class DeviceInfo:
 
 class Node:
     # Children is a list of nodes
-    def __init__(self, location: str, average_uptime: float, children, radius: int):
-        self.location = tuple(map(float, location[1:][:-1].split(', ')))
+    def __init__(self, x: float, y: float, average_uptime: float, children, radius: int):
+        self.x = x
+        self.y = y
         self.average_uptime = average_uptime
         self.children = children
 
@@ -156,7 +157,8 @@ def getClusterGrouped(
     nodes = []
 
     for device in devices:
-        nodes.append(Node(location=device.location, average_uptime=device.uptime, children=None, radius=0))
+        location = tuple(map(float, location[1:][:-1].split(', ')))
+        nodes.append(Node(x=location[0], y=location[1], average_uptime=device.uptime, children=None, radius=0))
 
     k = len(nodes)
 
