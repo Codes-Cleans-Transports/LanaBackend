@@ -45,7 +45,7 @@ def get_clusters(nodes: [], k):
                                 y=float(kmean.cluster_centers_[i][1]),
                                 average_uptime=float(cluster_uptime[i]),
                                 radius=cluster_radius[i],
-                                children=cluster_children[i],
+                                children=None,
                                 ))
 
     return final_nodes
