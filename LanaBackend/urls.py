@@ -16,10 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from interface.views import CreatePingView, GetPingsView, ListCLustersView
+from interface.views import CreatePingView, ListClustersView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('clusters/<cluster_id>/ping/<device_id>/', CreatePingView.as_view()),
-    path('clusters/', ListCLustersView.as_view())
+    path('clusters/', ListClustersView.as_view())
 ]
