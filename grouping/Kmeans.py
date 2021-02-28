@@ -3,10 +3,12 @@ import math
 import numpy
 from sklearn.cluster import KMeans
 
-from core.logic import Node
 
 
 def get_clusters(nodes: [], k):
+
+    from core.logic import Node
+
     kmean = KMeans(n_clusters=k)
     locations = []
     for i in nodes:
