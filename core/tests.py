@@ -29,21 +29,9 @@ class CoreTestCase(TestCase):
     def test_MongodbSave(self):
         device = DeviceData(id = "1", clusterId = "cl1")
         device.save()
-        # device.buckets[0] = TimeArray()
-        # device.buckets[0].data = [{'uptime': 0.1, 'date': str(datetime.datetime.now())}]
-        
-        # device.save()
+
         savedDevice = DeviceData.objects.get(id = '1')
         self.assertTrue(device == savedDevice)
-
-    # def test_savePing(self):
-    #     ping = DevicePing('1', 'cl1', 'here', current_time)
-    #     savePing(ping)
-
-    #     expected = DeviceData('1', 'cl1')
-
-    #     received = DeviceData.objects.get(id = '1')
-    #     self.assertEq(expected, device)
 
     @mock.patch("core.logic.datetime") 
     def test_addPingEmpty(self, datetime_mock):
@@ -193,6 +181,34 @@ class CoreTestCase(TestCase):
         expected = createDevice(DevicePing(id="1", clusterId="cl1", location=location))
         expected.buckets[0]['currentSequence'] = 4
         expected.buckets[0]['data'] = data
+
+        self.assertEq(expected, device)
+
+
+    @mock.patch("core.logic.datetime")
+    def test_calculateAverageOnOverflow(self, datetime_mock):
+        location = '30.000 20.000'
+
+        current_time = datetime.datetime.now()
+        datetime_mock.now.return_value = current_time
+        old_time = current_time
+
+        device = createDevice(DevicePing(id="1", clusterId="cl1", location=location))
+
+        overflow = device.buckets[0]['overflow']
+        data = []
+        for i in range(0, overflow):
+            data.append((i * 10) % 100) 
+
+        for i in range(0, len(data)):
+            addPingCustom(device, current_time + timedelta(minutes=i + 1), data[i])
+
+        expectedUptime = Average(data)
+        expected = createDevice(DevicePing(id="1", clusterId="cl1", location=location))
+        expected.buckets[0]['currentSequence'] = 0
+        expected.buckets[0]['data'] = device.buckets[0]['data']
+        expected.buckets[1]['currentSequence'] = 1
+        expected.buckets[1]['data'] = [{'uptime': expectedUptime, 'date': current_time + timedelta(minutes=len(data))}]
 
         self.assertEq(expected, device)
 

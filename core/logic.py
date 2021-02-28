@@ -43,9 +43,12 @@ def acceptPing(devicePing: DevicePing):
 def addPing(device: DeviceData):
     missingDates = getMissingDates(device)
     for date in missingDates:
-        addNewSegmentToList(device, date, 0, 0)
+        addPingCustom(device, date, 0)
 
-    addNewSegmentToList(device, datetime.now(), 100, 0)
+    addPingCustom(device, datetime.now(), 100)
+
+def addPingCustom(device, time, uptime):
+    addNewSegmentToList(device, time, uptime, 0)
     checkForOverflow(device, 0)
 
 def addNewSegmentToList(device, time, uptime, bucket):
@@ -61,16 +64,18 @@ def addNewSegmentToList(device, time, uptime, bucket):
     device.buckets[bucket]['data'] = list(q)
 
 def checkForOverflow(device, bucket):
-    if(device.buckets[bucket]['currentSequence'] == device.buckets[bucket]['overflow']):
+    if(device.buckets[bucket]['currentSequence'] >= device.buckets[bucket]['overflow']):
         overflow(device, bucket)
 
 def overflow(device, bucket):
     # Ignore if last bucket
-    if(bucket < len(device.buckets)):
+    if(bucket < len(device.buckets) - 1):
         device.buckets[bucket]['currentSequence'] = 0
 
-        uptime = getNextSegmentAvg(device, bucket)
-        addNewSegmentToList(device, datetime.now(), uptime, bucket + 1)
+        nextSegmentData = getNextSegmentAvg(device, bucket)
+        uptime = nextSegmentData['uptime']
+        date = nextSegmentData['date']
+        addNewSegmentToList(device, date, uptime, bucket + 1)
 
         checkForOverflow(device, bucket + 1)
 
@@ -78,8 +83,8 @@ def getNextSegmentAvg(device, bucket):
     overflow = device.buckets[bucket]['overflow']
     data = device.buckets[bucket]['data'][:overflow]
     uptime_list = list(map(lambda a : a['uptime'], data))
-    average = Average(uptime_list)
-    return average
+    uptime = Average(uptime_list)
+    return {'uptime': uptime, 'date': device.buckets[bucket]['data'][overflow - 1]['date']}
 
 def Average(lst): 
     return sum(lst) / len(lst) 
