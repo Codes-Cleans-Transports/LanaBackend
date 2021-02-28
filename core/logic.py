@@ -158,11 +158,11 @@ def getClusterGrouped(
     for device in devices:
         nodes.append(Node(location=device.location, average_uptime=device.uptime, children=None, radius=0))
 
-    k = 930
+    k = len(nodes)
 
-    for i in range(7):
+    for i in range(6):
         nodes = get_clusters(nodes=nodes, k=k)
-        k = int(k/3)
+        k = ceil(k/3)
 
     return nodes
 
