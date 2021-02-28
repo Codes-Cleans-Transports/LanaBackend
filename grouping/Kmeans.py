@@ -30,7 +30,7 @@ def get_clusters(nodes: [], k):
         if not nodes[i].children:
             cluster_children[kmean.labels_[i]].append(nodes[i])
         else:
-            cluster_children[kmean.labels_[i]] += nodes[i].children
+            cluster_children[kmean.labels_[i]].append(nodes[i].children)
         x1 = locations[i][0]
         y1 = locations[i][1]
         x2 = kmean.cluster_centers_[kmean.labels_[i]][0]
