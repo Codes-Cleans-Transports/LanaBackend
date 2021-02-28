@@ -1,7 +1,7 @@
 import math
 
 import numpy
-# from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans
 
 
 def get_clusters(nodes: [], k):
