@@ -1,9 +1,11 @@
 import math
 
 import numpy
-from sklearn.cluster import KMeans
+# from sklearn.cluster import KMeans
 
 from grouping.models import Cluster
+
+from core.logic import Node
 
 
 def get_clusters(devices: [], k):
@@ -16,6 +18,9 @@ def get_clusters(devices: [], k):
     clusters_number = numpy.ones(k)
     cluster_uptime = numpy.ones(k)
     cluster_radius = numpy.ones(k)
+
+    children = numpy.ones(k)
+    
     for i in range(len(devices)):
         clusters_sum[kmean.labels_[i]] += devices[i].average_uptime
         clusters_number[kmean.labels_[i]] += 1
@@ -30,11 +35,13 @@ def get_clusters(devices: [], k):
     for i in range(k):
         cluster_uptime[i] = clusters_sum[i] / clusters_number[i]
 
-    clusters = []
+    nodes = []
 
     for i in range(k):
-        clusters.append(Cluster(location=kmean.cluster_centers_[i],
-                                average_uptime=cluster_uptime[i],
-                                radius=cluster_radius[i]))
+        nodes.append(Node(location=kmean.cluster_centers_[i],
+                          average_uptime=cluster_uptime[i],
+                          radius=cluster_radius[i],
+                          # TODO: Fill children with nodes that belong to this new group
+                          children=[]))
 
     return clusters
