@@ -17,6 +17,13 @@ class DeviceInfo:
         self.location = location
         self.uptime = uptime
 
+class Node:
+    # Children is a list of nodes
+    def __init__(self, location: str, average_uptime: float, children, radius: int):
+        self.location = list(map(float, location.split(' ')))
+        self.average_uptime = average_uptime
+        self.children = children
+
 
 timeBetweenPings = 60
 
@@ -124,6 +131,26 @@ def generateMissingSegments(startDate, number):
         data.append(startDate + timedelta(seconds=i * timeBetweenPings))
 
     return data
+
+def getClusterGrouped(
+    *,
+    cluster_id: str
+) -> List[Node]:
+    devices = getDevicesByClusterAndBucketLevel(cluster_id=cluster_id, bucket_level=0)
+    nodes = []
+
+    roots = []
+
+    for device in devices:
+        Node(location=device.location, lifetime=device.lifetime, children=None)
+
+    for i in range(8):
+        # TODO: Trigger KMeans and generate Nodes from Nodes
+        # TODO: Construct the n-dimensional array that will hold the groups
+        pass
+
+    return roots
+
 
 def getClusters():
     return list(DeviceData.objects.all().values('clusterId').distinct().values_list('clusterId', flat=True))
