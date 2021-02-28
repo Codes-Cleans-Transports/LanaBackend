@@ -2,6 +2,8 @@ from datetime import datetime, timedelta
 from core.models import DeviceData
 from collections import deque
 
+from grouping.Kmeans import get_clusters
+
 from typing import List
 
 class DevicePing:
@@ -150,19 +152,19 @@ def getClusterGrouped(
     cluster_id: str
 ) -> List[Node]:
     devices = getDevicesByClusterAndBucketLevel(cluster_id=cluster_id, bucket_level=0)
+
     nodes = []
 
-    roots = []
-
     for device in devices:
-        Node(location=device.location, lifetime=device.lifetime, children=None)
+        nodes.append(Node(location=device.location, lifetime=device.lifetime, children=None))
 
-    for i in range(8):
-        # TODO: Trigger KMeans and generate Nodes from Nodes
-        # TODO: Construct the n-dimensional array that will hold the groups
-        pass
+    k = 930
 
-    return roots
+    for i in range(7):
+        nodes = get_clusters(nodes=nodes, k=k)
+        k = int(k/3)
+
+    return nodes
 
 
 def getClusters():
